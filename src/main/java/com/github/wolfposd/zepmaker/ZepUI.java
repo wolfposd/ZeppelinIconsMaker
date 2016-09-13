@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 public class ZepUI {
 
     public JFrame frame;
-    public ImageLabel imageLoadedPreview;
+    public JLabel imageLoadedPreview;
 
     public JCheckBox paddingEnabled;
     public JCheckBox keepColors;
@@ -49,7 +49,7 @@ public class ZepUI {
         frame = new JFrame("Zeppelin Logo Maker");
         frame.setLayout(new BorderLayout());
 
-        imageLoadedPreview = new ImageLabel();
+        imageLoadedPreview = new JLabel();
 
         loadImageButton = new JButton("Select Image");
 

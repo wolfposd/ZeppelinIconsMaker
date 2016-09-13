@@ -146,7 +146,7 @@ public class ZepController {
 
         if (res == JFileChooser.APPROVE_OPTION && f != null) {
             lastFile = f;
-            ImageIcon icon = new ImageIcon(f.getAbsolutePath());
+            ImageIcon icon = new StretchIcon(f.getAbsolutePath());
             zepui.imageLoadedPreview.setIcon(icon);
         }
 
