@@ -138,7 +138,7 @@ public class ZepController {
     public void loadAction() {
 
         JFileChooser jf = new JFileChooser();
-        jf.setFileFilter(new FileNameExtensionFilter("Only Imagefiles (png, jpg, gif)", "png", "jpg", "gif"));
+        jf.setFileFilter(new FileNameExtensionFilter("Only Imagefiles (png)", "png"));
         jf.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         int res = jf.showOpenDialog(zepui.frame);
