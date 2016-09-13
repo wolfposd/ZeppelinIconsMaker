@@ -28,18 +28,20 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ZepController {
 
-    // private JLabel black; // weiß
-    // private JLabel etched; // weiß mit rand
-    // private JLabel logo; // schwarz
-    // private JLabel silver; // schwarz
+    // black.png -> white
+    // etched.png -> white (usually with black etches)
+    // logo.png -> black
+    // silver.png -> black
 
     public static final int SIZE_3X_PADDING = 8;
     public static final int SIZE_3X = 42;
@@ -58,7 +60,7 @@ public class ZepController {
 
         zepui.createButton.addActionListener(e -> createAction());
         zepui.loadImageButton.addActionListener(e -> loadAction());
-        
+
         zepui.setVisible(true);
 
     }
@@ -68,30 +70,42 @@ public class ZepController {
         zepui.processing.setText("Starting Conversion...");
         zepui.processing.setForeground(Color.BLACK);
 
-        int result = convertAndSaveImages();
+        SwingWorker<Integer, Object> w = new SwingWorker<Integer, Object>() {
+            protected Integer doInBackground() throws Exception {
+                return convertAndSaveImages();
+            }
+        };
 
-        switch (result) {
-        case 1:
-            zepui.processing.setText("All done!");
-            zepui.processing.setForeground(new Color(0, 100, 0));
-            break;
-        case -1:
-            zepui.processing.setText("Couldn't create outputfolder");
-            zepui.processing.setForeground(new Color(178, 34, 34));
-            break;
-        case -2:
-            zepui.processing.setText("Couldn't save image");
-            zepui.processing.setForeground(new Color(178, 34, 34));
-            break;
-        }
-
+        w.execute();
+        w.addPropertyChangeListener(evt -> {
+            if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                try {
+                    int result = w.get();
+                    switch (result) {
+                    case 1:
+                        zepui.processing.setText("All done! :-)");
+                        zepui.processing.setForeground(new Color(0, 100, 0));
+                        break;
+                    case -1:
+                        zepui.processing.setText("Couldn't create outputfolder :-(");
+                        zepui.processing.setForeground(new Color(178, 34, 34));
+                        break;
+                    case -2:
+                        zepui.processing.setText("Couldn't save image :-(");
+                        zepui.processing.setForeground(new Color(178, 34, 34));
+                        break;
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    zepui.processing.setText("Some shit happened :-(");
+                    zepui.processing.setForeground(new Color(178, 34, 34));
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private int convertAndSaveImages() {
         Image image = ((ImageIcon) zepui.imageLoadedPreview.getIcon()).getImage();
-
-        System.out.println("keeping Colors:" + zepui.keepColors.isSelected());
-        System.out.println("padding: " + zepui.paddingEnabled.isSelected());
 
         Image[] images = preparedImages(image, zepui.keepColors.isSelected(), zepui.paddingEnabled.isSelected());
 
