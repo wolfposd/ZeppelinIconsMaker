@@ -60,6 +60,18 @@ public class ZepController {
 
         zepui.createButton.addActionListener(e -> createAction());
         zepui.loadImageButton.addActionListener(e -> loadAction());
+        zepui.imageLoadedPreview.setTransferHandler(new SingleFileTransferHandler(f -> {
+            if (f != null) {
+                String extension = getFileExtension(f).toLowerCase();
+                if ("png".equals(extension)) {
+                    loadImageIntoPreview(f);
+                } else {
+                    zepui.setErrorText("Can only import PNG");
+                }
+            } else {
+                zepui.setErrorText("Can only import one file");
+            }
+        }));
 
         zepui.setVisible(true);
 
@@ -83,25 +95,25 @@ public class ZepController {
                     int result = w.get();
                     switch (result) {
                     case 1:
-                        zepui.processing.setText("All done! :-)");
-                        zepui.processing.setForeground(new Color(0, 100, 0));
+                        zepui.setSuccessText("All done! :-)");
                         break;
                     case -1:
-                        zepui.processing.setText("Couldn't create outputfolder :-(");
-                        zepui.processing.setForeground(new Color(178, 34, 34));
+                        zepui.setErrorText("Couldn't create outputfolder :-(");
                         break;
                     case -2:
-                        zepui.processing.setText("Couldn't save image :-(");
-                        zepui.processing.setForeground(new Color(178, 34, 34));
+                        zepui.setErrorText("Couldn't create outputfolder :-(");
                         break;
                     }
                 } catch (InterruptedException | ExecutionException e) {
-                    zepui.processing.setText("Some shit happened :-(");
-                    zepui.processing.setForeground(new Color(178, 34, 34));
+                    zepui.setErrorText("Some shit happened :-(");
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+    private String getFileExtension(File f) {
+        return f.getName().substring(f.getName().lastIndexOf(".") + 1);
     }
 
     private int convertAndSaveImages() {
@@ -109,7 +121,7 @@ public class ZepController {
 
         Image[] images = preparedImages(image, zepui.keepColors.isSelected(), zepui.paddingEnabled.isSelected());
 
-        String fileExtension = lastFile.getName().substring(lastFile.getName().lastIndexOf(".") + 1);
+        String fileExtension = getFileExtension(lastFile);
         File newFolder = new File(lastFile.getParentFile(), lastFile.getName().substring(0, lastFile.getName().lastIndexOf(".")));
 
         if (!newFolder.exists()) {
@@ -159,11 +171,15 @@ public class ZepController {
         File f = jf.getSelectedFile();
 
         if (res == JFileChooser.APPROVE_OPTION && f != null) {
-            lastFile = f;
-            ImageIcon icon = new StretchIcon(f.getAbsolutePath());
-            zepui.imageLoadedPreview.setIcon(icon);
+            loadImageIntoPreview(f);
         }
+    }
 
+    public void loadImageIntoPreview(File f) {
+        lastFile = f;
+        ImageIcon icon = new StretchIcon(f.getAbsolutePath());
+        zepui.imageLoadedPreview.setIcon(icon);
+        zepui.setSuccessText("Loaded image.");
     }
 
     public Image[] preparedImages(Image image, boolean leavecolors, boolean padding) {
@@ -244,5 +260,4 @@ public class ZepController {
         // Return the buffered image
         return bimage;
     }
-
 }

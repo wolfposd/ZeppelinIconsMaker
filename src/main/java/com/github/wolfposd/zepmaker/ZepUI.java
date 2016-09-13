@@ -24,6 +24,7 @@
 package com.github.wolfposd.zepmaker;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
@@ -69,10 +70,9 @@ public class ZepUI {
         southPanel.add(createButton);
         southPanel.add(processing);
 
-        
         JPanel imagePanel = new JPanel(new BorderLayout());
         imagePanel.add(imageLoadedPreview, BorderLayout.CENTER);
-        
+
         imagePanel.setBorder(BorderFactory.createTitledBorder("Preview"));
         southPanel.setBorder(BorderFactory.createTitledBorder("Config"));
 
@@ -85,6 +85,20 @@ public class ZepUI {
         frame.setLocationRelativeTo(null);
 
     }
+    
+    public void setSuccessText(String t)
+    {
+        processing.setText(t);
+        processing.setForeground(new Color(0, 100, 0));
+    }
+    public void setErrorText(String t)
+    {
+        processing.setText(t);
+        processing.setForeground(new Color(178, 34, 34));
+    }
+    
+    
+    
 
     public void setVisible(boolean vs) {
         frame.setVisible(vs);
