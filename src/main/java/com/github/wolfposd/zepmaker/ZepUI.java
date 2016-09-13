@@ -51,6 +51,8 @@ public class ZepUI {
         frame.setLayout(new BorderLayout());
 
         imageLoadedPreview = new JLabel();
+        imageLoadedPreview.setHorizontalAlignment(JLabel.CENTER);
+        imageLoadedPreview.setText("Select Image or Drag/Drop");
 
         loadImageButton = new JButton("Select Image");
 
@@ -85,20 +87,16 @@ public class ZepUI {
         frame.setLocationRelativeTo(null);
 
     }
-    
-    public void setSuccessText(String t)
-    {
+
+    public void setSuccessText(String t) {
         processing.setText(t);
         processing.setForeground(new Color(0, 100, 0));
     }
-    public void setErrorText(String t)
-    {
+
+    public void setErrorText(String t) {
         processing.setText(t);
         processing.setForeground(new Color(178, 34, 34));
     }
-    
-    
-    
 
     public void setVisible(boolean vs) {
         frame.setVisible(vs);

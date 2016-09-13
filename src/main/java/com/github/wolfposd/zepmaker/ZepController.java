@@ -179,6 +179,7 @@ public class ZepController {
         lastFile = f;
         ImageIcon icon = new StretchIcon(f.getAbsolutePath());
         zepui.imageLoadedPreview.setIcon(icon);
+        zepui.imageLoadedPreview.setText("");
         zepui.setSuccessText("Loaded image.");
     }
 
