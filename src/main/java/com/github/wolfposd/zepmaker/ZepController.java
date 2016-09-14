@@ -44,12 +44,12 @@ public class ZepController {
     // silver.png -> black
 
     public static final int SIZE_3X_PADDING = 8;
-    public static final int SIZE_3X = 42;
-    public static final int SIZE_2X = 28;
-    public static final int SIZE_1X = 14;
-    private int[] sizes = { SIZE_1X, SIZE_2X, SIZE_3X };
-    private String[] filenames = { "black", "etched", "logo", "silver" };
-    private String[] fileappends = { "", "@2x", "@3x" };
+    public static final int SIZE_3X = 48;
+    public static final int SIZE_2X = 32;
+    public static final int SIZE_1X = 16;
+    private int[] sizes = {SIZE_1X, SIZE_2X, SIZE_3X};
+    private String[] filenames = {"black", "etched", "logo", "silver"};
+    private String[] fileappends = {"", "@2x", "@3x"};
     private File lastFile = null;
 
     private ZepUI zepui;
@@ -66,10 +66,10 @@ public class ZepController {
                 if ("png".equals(extension)) {
                     loadImageIntoPreview(f);
                 } else {
-                    zepui.setErrorText("Can only import PNG");
+                    zepui.setErrorText("Error: Can only import PNG");
                 }
             } else {
-                zepui.setErrorText("Can only import one file");
+                zepui.setErrorText("Error: Can only import one file");
             }
         }));
 
@@ -83,6 +83,7 @@ public class ZepController {
         zepui.processing.setForeground(Color.BLACK);
 
         SwingWorker<Integer, Object> w = new SwingWorker<Integer, Object>() {
+            @Override
             protected Integer doInBackground() throws Exception {
                 return convertAndSaveImages();
             }
@@ -94,18 +95,18 @@ public class ZepController {
                 try {
                     int result = w.get();
                     switch (result) {
-                    case 1:
-                        zepui.setSuccessText("All done! :-)");
-                        break;
-                    case -1:
-                        zepui.setErrorText("Couldn't create outputfolder :-(");
-                        break;
-                    case -2:
-                        zepui.setErrorText("Couldn't create outputfolder :-(");
-                        break;
+                        case 1 :
+                            zepui.setSuccessText("All done! :-)");
+                            break;
+                        case -1 :
+                            zepui.setErrorText("Error: Couldn't create outputfolder :-(");
+                            break;
+                        case -2 :
+                            zepui.setErrorText("Error: Couldn't create outputfolder :-(");
+                            break;
                     }
                 } catch (InterruptedException | ExecutionException e) {
-                    zepui.setErrorText("Some shit happened :-(");
+                    zepui.setErrorText("Error: Some unexpected shit happened :-(");
                     e.printStackTrace();
                 }
             }
@@ -137,9 +138,9 @@ public class ZepController {
                 for (int j = 0; j < sizes.length; j++) {
                     int size = sizes[j];
 
-                    float scale = h / size;
-                    int newW = (int) (w / scale);
-                    int newH = (int) (h / scale);
+                    float scale = (float)h / (float)size;
+                    int newW = Math.round(Math.round((double) w / scale));
+                    int newH = Math.round(Math.round((double) h / scale));
 
                     Image newImg = curIm.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
 
@@ -193,10 +194,10 @@ public class ZepController {
             result[2] = recolorImage(image, Color.BLACK.getRGB(), padding);
             result[3] = recolorImage(image, Color.BLACK.getRGB(), padding);
         } else {
-            result[0] = padding ? padImage(image) : image;
-            result[1] = padding ? padImage(image) : image;
-            result[2] = padding ? padImage(image) : image;
-            result[3] = padding ? padImage(image) : image;
+            result[0] = padding ? padImage(image) : toBufferedImage(image); //this also creates copies
+            result[1] = padding ? padImage(image) : toBufferedImage(image);
+            result[2] = padding ? padImage(image) : toBufferedImage(image);
+            result[3] = padding ? padImage(image) : toBufferedImage(image);
         }
 
         return result;
