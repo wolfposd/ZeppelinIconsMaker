@@ -36,23 +36,17 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.github.wolfposd.zepmaker.formats.IFormat;
+import com.github.wolfposd.zepmaker.formats.LockglyphFormat;
+import com.github.wolfposd.zepmaker.formats.ZeppelinFormat;
+
 public class ZepController {
 
-    // black.png -> white
-    // etched.png -> white (usually with black etches)
-    // logo.png -> black
-    // silver.png -> black
-
-    public static final int SIZE_3X_PADDING = 8;
-    public static final int SIZE_3X = 48;
-    public static final int SIZE_2X = 32;
-    public static final int SIZE_1X = 16;
-    private int[] sizes = {SIZE_1X, SIZE_2X, SIZE_3X};
-    private String[] filenames = {"black", "etched", "logo", "silver"};
-    private String[] fileappends = {"", "@2x", "@3x"};
     private File lastFile = null;
 
     private ZepUI zepui;
+
+    private IFormat currentFormat = new ZeppelinFormat();
 
     public ZepController() {
 
@@ -73,8 +67,23 @@ public class ZepController {
             }
         }));
 
+        zepui.formatSelection.addActionListener(e -> formatSelectionChanged());
+
         zepui.setVisible(true);
 
+    }
+
+    private void formatSelectionChanged() {
+        String value = (String) zepui.formatSelection.getSelectedItem();
+        switch (value) {
+            case "LockGlyph" :
+                currentFormat = new LockglyphFormat();
+                break;
+            case "Zeppelin" :
+            default :
+                currentFormat = new ZeppelinFormat();
+        }
+        System.out.println(currentFormat);
     }
 
     public void createAction() {
@@ -104,6 +113,9 @@ public class ZepController {
                         case -2 :
                             zepui.setErrorText("Error: Couldn't create outputfolder :-(");
                             break;
+                        case -3 :
+                            zepui.setErrorText("Error: Select an image first");
+                            break;
                     }
                 } catch (InterruptedException | ExecutionException e) {
                     zepui.setErrorText("Error: Some unexpected shit happened :-(");
@@ -118,7 +130,12 @@ public class ZepController {
     }
 
     private int convertAndSaveImages() {
-        Image image = ((ImageIcon) zepui.imageLoadedPreview.getIcon()).getImage();
+        Image image = null;
+        try {
+            image = ((ImageIcon) zepui.imageLoadedPreview.getIcon()).getImage();
+        } catch (NullPointerException ex) {
+            return -3;
+        }
 
         Image[] images = preparedImages(image, zepui.keepColors.isSelected(), zepui.paddingEnabled.isSelected());
 
@@ -135,16 +152,17 @@ public class ZepController {
                 int w = curIm.getWidth(null);
                 int h = curIm.getHeight(null);
 
-                for (int j = 0; j < sizes.length; j++) {
-                    int size = sizes[j];
+                for (int j = 0; j < currentFormat.getSizes().length; j++) {
+                    int size = currentFormat.getSizes()[j];
 
-                    float scale = (float)h / (float)size;
+                    float scale = (float) h / (float) size;
                     int newW = Math.round(Math.round((double) w / scale));
                     int newH = Math.round(Math.round((double) h / scale));
 
                     Image newImg = curIm.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
 
-                    File destinationFile = new File(newFolder, filenames[i] + "" + fileappends[j] + "." + fileExtension);
+                    File destinationFile = new File(newFolder, currentFormat.getFileNames()[i] + "" + currentFormat.getFileappends()[j]
+                            + "." + fileExtension);
 
                     try {
                         ImageIO.write(toBufferedImage(newImg), fileExtension, destinationFile);
@@ -161,7 +179,6 @@ public class ZepController {
         }
         return 1;
     }
-
     public void loadAction() {
 
         JFileChooser jf = new JFileChooser();
@@ -185,28 +202,28 @@ public class ZepController {
     }
 
     public Image[] preparedImages(Image image, boolean leavecolors, boolean padding) {
-        Image[] result = new Image[4];
+        Image[] result = new Image[currentFormat.getFileNames().length];
 
-        // 1=white, 2=white, 3=black, 4=black
         if (!leavecolors) {
-            result[0] = recolorImage(image, Color.WHITE.getRGB(), padding);
-            result[1] = recolorImage(image, Color.WHITE.getRGB(), padding);
-            result[2] = recolorImage(image, Color.BLACK.getRGB(), padding);
-            result[3] = recolorImage(image, Color.BLACK.getRGB(), padding);
+            Color[] recolors = currentFormat.getRecolors();
+            for (int i = 0; i < recolors.length; i++) {
+                Color rec = recolors[i];
+                result[i] = recolorImage(image, rec.getRGB(), padding);
+            }
         } else {
-            result[0] = padding ? padImage(image) : toBufferedImage(image); //this also creates copies
-            result[1] = padding ? padImage(image) : toBufferedImage(image);
-            result[2] = padding ? padImage(image) : toBufferedImage(image);
-            result[3] = padding ? padImage(image) : toBufferedImage(image);
+            for (int i = 0; i < currentFormat.getFileNames().length; i++) {
+                result[i] = padding ? padImage(image) : toBufferedImage(image);
+                // this also creates copies
+            }
         }
 
         return result;
     }
 
-    public static Image padImage(Image origImage) {
+    public Image padImage(Image origImage) {
         int width = origImage.getWidth(null);
-        float scale = width / SIZE_3X;
-        int padding = Math.round(SIZE_3X_PADDING * scale);
+        float scale = width / currentFormat.getSizeBiggest();
+        int padding = Math.round(currentFormat.getPaddingForBiggest() * scale);
 
         BufferedImage bufimage = new BufferedImage(padding + origImage.getWidth(null), origImage.getHeight(null),
                 BufferedImage.TYPE_4BYTE_ABGR);
@@ -218,13 +235,13 @@ public class ZepController {
 
     }
 
-    public static Image recolorImage(Image origImage, int newColor, boolean paddingEnabled) {
+    public Image recolorImage(Image origImage, int newColor, boolean paddingEnabled) {
 
         int padding = 0;
         if (paddingEnabled) {
             int width = origImage.getWidth(null);
-            float scale = width / SIZE_3X;
-            padding = Math.round(SIZE_3X_PADDING * scale);
+            float scale = width / currentFormat.getSizeBiggest();
+            padding = Math.round(currentFormat.getPaddingForBiggest() * scale);
         }
 
         BufferedImage bufimage = new BufferedImage(padding + origImage.getWidth(null), origImage.getHeight(null),

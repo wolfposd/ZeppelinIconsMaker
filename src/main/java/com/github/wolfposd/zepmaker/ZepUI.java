@@ -25,11 +25,15 @@ package com.github.wolfposd.zepmaker;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -45,9 +49,10 @@ public class ZepUI {
     public JLabel processing;
     public JButton createButton;
     public JButton loadImageButton;
+    public JComboBox<String> formatSelection;
 
     public ZepUI() {
-        frame = new JFrame("Zeppelin Logo Maker 0.0.3");
+        frame = new JFrame("Zeppelin Logo Maker 0.0.4");
         frame.setLayout(new BorderLayout());
 
         imageLoadedPreview = new JLabel();
@@ -59,16 +64,19 @@ public class ZepUI {
         paddingEnabled = new JCheckBox("Add left-padding");
         keepColors = new JCheckBox("Keep colors");
 
-        createButton = new JButton("Create");
+        createButton = new JButton("Convert Image");
+
+        formatSelection = new JComboBox<>(new String[]{"Zeppelin", "LockGlyph"});
 
         processing = new JLabel(" ");
         processing.setFont(processing.getFont().deriveFont(22.0f));
         processing.setHorizontalAlignment(JLabel.CENTER);
 
-        JPanel southPanel = new JPanel(new GridLayout(5, 1));
-        southPanel.add(loadImageButton);
+        JPanel southPanel = new JPanel(new GridLayout(6, 1));
         southPanel.add(paddingEnabled);
         southPanel.add(keepColors);
+        southPanel.add(wrap(new FlowLayout(FlowLayout.LEFT), new JLabel("Convert for: "), formatSelection));
+        southPanel.add(loadImageButton);
         southPanel.add(createButton);
         southPanel.add(processing);
 
@@ -87,7 +95,6 @@ public class ZepUI {
         frame.setLocationRelativeTo(null);
 
     }
-
     public void setSuccessText(String t) {
         processing.setText(t);
         processing.setForeground(new Color(0, 100, 0));
@@ -100,5 +107,13 @@ public class ZepUI {
 
     public void setVisible(boolean vs) {
         frame.setVisible(vs);
+    }
+
+    private JPanel wrap(LayoutManager layout, Component... components) {
+        JPanel p = new JPanel(layout);
+        for (Component c : components) {
+            p.add(c);
+        }
+        return p;
     }
 }
