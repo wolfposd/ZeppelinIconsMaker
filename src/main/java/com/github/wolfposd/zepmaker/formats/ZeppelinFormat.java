@@ -48,4 +48,10 @@ public class ZeppelinFormat implements IFormat {
         return recolors;
     }
 
+    @Override
+    public String getHelpText() {
+        return "Converts images for use with the Zeppelin Tweak.\n"
+                + "Converted images must be placed in /Library/Zeppelin/<FOLDERNAME>/\n" + "on your iPhone/iPad";
+    }
+
 }

@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -54,6 +55,9 @@ public class ZepController {
 
         zepui.createButton.addActionListener(e -> createAction());
         zepui.loadImageButton.addActionListener(e -> loadAction());
+        zepui.helpButton.addActionListener(e -> helpButtonAction());
+        zepui.formatSelection.addActionListener(e -> formatSelectionChanged());
+        
         zepui.imageLoadedPreview.setTransferHandler(new SingleFileTransferHandler(f -> {
             if (f != null) {
                 String extension = getFileExtension(f).toLowerCase();
@@ -67,10 +71,13 @@ public class ZepController {
             }
         }));
 
-        zepui.formatSelection.addActionListener(e -> formatSelectionChanged());
 
         zepui.setVisible(true);
 
+    }
+
+    private void helpButtonAction() {
+        JOptionPane.showMessageDialog(zepui.frame, currentFormat.getHelpText(), "Help", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void formatSelectionChanged() {
@@ -83,7 +90,6 @@ public class ZepController {
             default :
                 currentFormat = new ZeppelinFormat();
         }
-        System.out.println(currentFormat);
     }
 
     public void createAction() {

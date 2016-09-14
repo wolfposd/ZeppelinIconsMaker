@@ -19,11 +19,12 @@ public interface IFormat {
      */
     public String[] getFileappends();
     
-    
     public int getSizeBiggest();
     
     public int getPaddingForBiggest();
     
     public Color[] getRecolors();
+    
+    public String getHelpText();
 
 }

@@ -50,6 +50,8 @@ public class ZepUI {
     public JButton createButton;
     public JButton loadImageButton;
     public JComboBox<String> formatSelection;
+    
+    public JButton helpButton;
 
     public ZepUI() {
         frame = new JFrame("Zeppelin Logo Maker 0.0.4");
@@ -60,6 +62,7 @@ public class ZepUI {
         imageLoadedPreview.setText("Select Image or Drag/Drop");
 
         loadImageButton = new JButton("Select Image");
+        helpButton = new JButton("?");
 
         paddingEnabled = new JCheckBox("Add left-padding");
         keepColors = new JCheckBox("Keep colors");
@@ -75,7 +78,7 @@ public class ZepUI {
         JPanel southPanel = new JPanel(new GridLayout(6, 1));
         southPanel.add(paddingEnabled);
         southPanel.add(keepColors);
-        southPanel.add(wrap(new FlowLayout(FlowLayout.LEFT), new JLabel("Convert for: "), formatSelection));
+        southPanel.add(wrap(new FlowLayout(FlowLayout.LEFT), new JLabel("Convert for: "), formatSelection, helpButton));
         southPanel.add(loadImageButton);
         southPanel.add(createButton);
         southPanel.add(processing);

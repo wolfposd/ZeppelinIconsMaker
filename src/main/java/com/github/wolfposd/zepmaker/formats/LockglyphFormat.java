@@ -39,4 +39,11 @@ public class LockglyphFormat implements IFormat {
         return recolor;
     }
 
+    @Override
+    public String getHelpText() {
+        return "Converts images for use with the LockGlyph Tweak.\n"
+                + "Converted images must be placed in /Library/Application Support/LockGlyph/Themes/<FOLDERNAME>.bundle/\n"
+                + "on your iPhone/iPad";
+    }
+
 }
