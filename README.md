@@ -22,3 +22,4 @@ You can find downloads in the ![release folder](https://github.com/wolfposd/Zepp
 ## Screenshots
 
 ![Screenshot1](https://raw.githubusercontent.com/wolfposd/ZeppelinIconsMaker/master/screenshot/zepiconmakerscreenshot.png)
+![Screenshot1](https://raw.githubusercontent.com/wolfposd/ZeppelinIconsMaker/master/screenshot/windowsshot.png)

@@ -47,7 +47,7 @@ public class ZepUI {
     public JButton loadImageButton;
 
     public ZepUI() {
-        frame = new JFrame("Zeppelin Logo Maker");
+        frame = new JFrame("Zeppelin Logo Maker 0.0.3");
         frame.setLayout(new BorderLayout());
 
         imageLoadedPreview = new JLabel();
