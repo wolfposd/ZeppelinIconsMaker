@@ -51,7 +51,7 @@ public class ZeppelinFormat implements IFormat {
     @Override
     public String getHelpText() {
         return "Converts images for use with the Zeppelin Tweak.\n"
-                + "Converted images must be placed in /Library/Zeppelin/<FOLDERNAME>/\n" + "on your iPhone/iPad";
+                + "Converted images must be placed in /Library/Zeppelin/<FOLDERNAME>/\n" + "on your iPhone/iPad\n\n"+"When you select 'Keep colors', do not copy logo.png.";
     }
 
 }
