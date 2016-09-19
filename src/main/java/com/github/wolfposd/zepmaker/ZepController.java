@@ -204,7 +204,7 @@ public class ZepController {
         ImageIcon icon = new StretchIcon(f.getAbsolutePath());
         zepui.imageLoadedPreview.setIcon(icon);
         zepui.imageLoadedPreview.setText("");
-        zepui.setSuccessText("Loaded image.");
+        zepui.setSuccessText("Image loaded");
     }
 
     public Image[] preparedImages(Image image, boolean leavecolors, boolean padding) {
